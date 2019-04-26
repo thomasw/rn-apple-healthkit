@@ -67,7 +67,6 @@
     if ([type isEqual:@"Weight"]) {
         unit = [HKUnit gramUnit];
     }
-    NSLog(@"error getting samples: %@", [samplesType identifier]);
     [self fetchSamplesOfType:samplesType
                                 unit:unit
                            predicate:predicate
