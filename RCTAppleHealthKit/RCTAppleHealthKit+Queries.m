@@ -162,8 +162,9 @@
             NSLog(@"*** An error occured while setting up the stepCount observer. %@ ***", error.localizedDescription);
             return;
         }
-        NSLog(@"Observer query data received. Emitting observer event. %@", type.identifier);
-        [self.bridge.eventDispatcher sendAppEventWithName:@"observer" body:type.identifier];
+        NSString *eventName = [NSString stringWithFormat:@"%@%@", @"healthkit_observer_", type.identifier];
+        NSLog(@"Observer query data received. Emitting observer event. %@", eventName);
+        [self.bridge.eventDispatcher sendAppEventWithName:eventName body:nil];
         completionHandler();
     }];
 
