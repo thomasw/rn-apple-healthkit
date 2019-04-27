@@ -49,6 +49,98 @@
     }];
 }
 
+- (void)fitness_watchSamples:(NSDictionary *)input
+                     resolver:(RCTPromiseResolveBlock)resolve
+                    rejecter:(RCTPromiseRejectBlock)reject
+{
+    HKUnit *unit = [RCTAppleHealthKit hkUnitFromOptions:input key:@"unit" withDefault:nil];
+    NSString *type = [RCTAppleHealthKit stringFromOptions:input key:@"type" withDefault:nil];
+    NSString *resumeId = [RCTAppleHealthKit stringFromOptions:input key:@"resumeId" withDefault:nil];
+    NSString *resumeIdKey = [NSString stringWithFormat:@"%@%@", @"RCTAppleHealthKit:watchSamples:", resumeId];
+    HKQueryAnchor *anchor = HKAnchoredObjectQueryNoAnchor;
+    
+    if (resumeId) {
+        NSData *rawAnchor = [[NSUserDefaults standardUserDefaults] valueForKey:resumeIdKey];
+        HKQueryAnchor *decodedAnchor = [NSKeyedUnarchiver unarchivedObjectOfClass:[HKQueryAnchor class] fromData:rawAnchor error:nil];
+        
+        if (decodedAnchor) {
+            anchor = decodedAnchor;
+        }
+    }
+
+    if (!unit) {
+        reject(@"invalid_unit", @"You must specify a valid unit.", nil);
+        return;
+    }
+    
+    if (!type) {
+        reject(@"invalid_type", @"You must specify a valid type.", nil);
+        return;
+    }
+    
+    HKSampleType *samplesType = [RCTAppleHealthKit hkQuantityTypeFromString:type];
+    NSUInteger limit = [RCTAppleHealthKit uintFromOptions:input key:@"limit" withDefault:HKObjectQueryNoLimit];
+
+    void (^handler)(HKAnchoredObjectQuery *query, NSArray *sampleObjects, NSArray *deletedSampleObjects, HKQueryAnchor *anchor, NSError *error);
+    handler = ^(HKAnchoredObjectQuery *query, NSArray *sampleObjects, NSArray *deletedSampleObjects, HKQueryAnchor *anchor, NSError *error) {
+        NSMutableArray *samples = [NSMutableArray arrayWithCapacity:1];
+        NSMutableArray *deleted = [NSMutableArray arrayWithCapacity:1];
+        
+        if (!sampleObjects && !deleted) {
+            resolve(@{ @"samples": samples, @"deleted": deleted});
+            return;
+        }
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (samplesType == [HKObjectType workoutType]) {
+                for (HKWorkout *workout in sampleObjects) {
+                    [samples addObject:[RCTAppleHealthKit serializeHKWorkout:workout unit:unit]];
+                }
+            } else {
+                for (HKQuantitySample *sample in sampleObjects) {
+                    [samples addObject:[RCTAppleHealthKit serializeHKQuantitySample:sample unit:unit]];
+                }
+            }
+            
+            for (HKDeletedObject *deletedObject in deletedSampleObjects) {
+                [deleted addObject:[RCTAppleHealthKit serializeHKDeletedObject:deletedObject]];
+            }
+            
+            if (resumeId) {
+                NSData *data = [NSKeyedArchiver archivedDataWithRootObject:anchor requiringSecureCoding:YES error:nil];
+                [[NSUserDefaults standardUserDefaults] setObject:data forKey:resumeIdKey];
+            }
+            
+            resolve(@{ @"samples": samples, @"deleted": deleted});
+        });
+    };
+    
+    HKAnchoredObjectQuery *query =
+        [[HKAnchoredObjectQuery alloc]
+         initWithType:samplesType
+         predicate:nil
+         anchor:anchor
+         limit:limit
+         resultsHandler:handler];
+    
+    [self.healthStore executeQuery:query];
+}
+
+- (void)fitness_resetWatchSamples:(NSDictionary *)input
+                    resolver:(RCTPromiseResolveBlock)resolve
+                    rejecter:(RCTPromiseRejectBlock)reject {
+    NSString *resumeId = [RCTAppleHealthKit stringFromOptions:input key:@"resumeId" withDefault:nil];
+    NSString *resumeIdKey = [NSString stringWithFormat:@"%@%@", @"RCTAppleHealthKit:watchSamples:", resumeId];
+    
+    if (!resumeId) {
+        reject(@"resumeId_required", @"You must specify a resumeId.", nil);
+        return;
+    }
+
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:resumeIdKey];
+}
+
+
 - (void)fitness_getSamples:(NSDictionary *)input callback:(RCTResponseSenderBlock)callback
 {
     HKUnit *unit = [RCTAppleHealthKit hkUnitFromOptions:input key:@"unit" withDefault:[HKUnit countUnit]];

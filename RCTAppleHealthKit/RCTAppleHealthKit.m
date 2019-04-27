@@ -114,6 +114,20 @@ RCT_EXPORT_METHOD(getSamples:(NSDictionary *)input callback:(RCTResponseSenderBl
     [self fitness_getSamples:input callback:callback];
 }
 
+RCT_EXPORT_METHOD(watchSamples:(NSDictionary *)input
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject)
+{
+    [self fitness_watchSamples:input resolver:resolve rejecter:reject];
+}
+
+RCT_EXPORT_METHOD(resetWatchSamples:(NSDictionary *)input
+                   resolver:(RCTPromiseResolveBlock)resolve
+                   rejecter:(RCTPromiseRejectBlock)reject)
+{
+    [self fitness_resetWatchSamples:input resolver:resolve rejecter:reject];
+}
+
 RCT_EXPORT_METHOD(setObserver:(NSDictionary *)input)
 {
     [self fitness_setObserver:input];
