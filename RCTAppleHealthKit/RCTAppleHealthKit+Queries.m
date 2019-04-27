@@ -237,8 +237,6 @@
             NSLog(@"*** An error occured while setting up the stepCount observer. %@ ***", error.localizedDescription);
             return;
         }
-        [self.bridge.eventDispatcher sendAppEventWithName:@"observer" body:@""];
-        
         // Theoretically, HealthKit expect that copletionHandler would be called at the end of query process,
         // but it's unclear how to do in in event paradigm
         
@@ -246,8 +244,10 @@
 //        dispatch_after(delay, dispatch_get_main_queue(), ^(void){
 //            completionHandler();
 //        });
+        NSLog(@"Observer query data received. Emitting observer event. %@", type.identifier);
+        [self.bridge.eventDispatcher sendAppEventWithName:@"observer" body:type.identifier];
     }];
-    
+
     [self.healthStore executeQuery:query];
     [self.healthStore enableBackgroundDeliveryForType:type frequency:HKUpdateFrequencyImmediate withCompletion:^(BOOL success, NSError * _Nullable error) {
         NSLog(@"success %s print some error %@", success ? "true" : "false", [error localizedDescription]);
