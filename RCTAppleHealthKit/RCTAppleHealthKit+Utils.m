@@ -261,6 +261,91 @@
     return date;
 }
 
++ (NSDictionary *)serializeHKQuantitySample:(HKQuantitySample *)sample unit:(HKUnit *)unit {
+    HKQuantity *quantity = sample.quantity;
+    NSString *uuid = [[sample UUID] UUIDString];
+    double value = [quantity doubleValueForUnit:unit];
+    
+    NSString * valueType = @"quantity";
+    if (unit == [HKUnit mileUnit]) {
+        valueType = @"distance";
+    }
+    
+    NSString *startDateString = [RCTAppleHealthKit buildISO8601StringFromDate:sample.startDate];
+    NSString *endDateString = [RCTAppleHealthKit buildISO8601StringFromDate:sample.endDate];
+    
+    bool isTracked = true;
+    if ([[sample metadata][HKMetadataKeyWasUserEntered] intValue] == 1) {
+        isTracked = false;
+    }
+    
+    NSString* device = @"";
+    if (@available(iOS 11.0, *)) {
+        device = [[sample sourceRevision] productType];
+    } else {
+        device = [[sample device] name];
+        if (!device) {
+            device = @"iPhone";
+        }
+    }
+    
+    return @{
+             @"uuid": uuid,
+             valueType : @(value),
+             @"tracked" : @(isTracked),
+             @"sourceName" : [[[sample sourceRevision] source] name],
+             @"sourceId" : [[[sample sourceRevision] source] bundleIdentifier],
+             @"device": device,
+             @"start" : startDateString,
+             @"end" : endDateString
+    };
+}
+
++ (NSDictionary *)serializeHKWorkout:(HKWorkout *)workout unit:(HKUnit *)unit {
+    double energy =  [[workout totalEnergyBurned] doubleValueForUnit:[HKUnit kilocalorieUnit]];
+    double distance = [[workout totalDistance] doubleValueForUnit:[HKUnit mileUnit]];
+    NSString *type = [RCTAppleHealthKit stringForHKWorkoutActivityType:[workout workoutActivityType]];
+    NSString *uuid = [[workout UUID] UUIDString];
+    
+    NSString *startDateString = [RCTAppleHealthKit buildISO8601StringFromDate:workout.startDate];
+    NSString *endDateString = [RCTAppleHealthKit buildISO8601StringFromDate:workout.endDate];
+    
+    bool isTracked = true;
+    if ([[workout metadata][HKMetadataKeyWasUserEntered] intValue] == 1) {
+        isTracked = false;
+    }
+    
+    NSString* device = @"";
+    if (@available(iOS 11.0, *)) {
+        device = [[workout sourceRevision] productType];
+    } else {
+        device = [[workout device] name];
+        if (!device) {
+            device = @"iPhone";
+        }
+    }
+    
+    return @{
+             @"uuid": uuid,
+             @"activityId": [NSNumber numberWithInt:[workout workoutActivityType]],
+             @"activityName": type,
+             @"calories": @(energy),
+             @"tracked": @(isTracked),
+             @"sourceName": [[[workout sourceRevision] source] name],
+             @"sourceId": [[[workout sourceRevision] source] bundleIdentifier],
+             @"device": device,
+             @"distance": @(distance),
+             @"start": startDateString,
+             @"end": endDateString
+    };
+    
+}
+
++(NSDictionary *)serializeHKDeletedObject:(HKDeletedObject *)object {
+    NSString *uuid = [[object UUID] UUIDString];
+    return @{ @"uuid": uuid };
+}
+
 
 + (NSString *)stringFromOptions:(NSDictionary *)options key:(NSString *)key withDefault:(NSString *)defaultValue {
     NSString *str = [options objectForKey:key];

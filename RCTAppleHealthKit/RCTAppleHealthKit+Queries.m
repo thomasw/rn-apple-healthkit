@@ -132,87 +132,12 @@
 
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (type == [HKObjectType workoutType]) {
-                    for (HKWorkout *sample in results) {
-                        double energy =  [[sample totalEnergyBurned] doubleValueForUnit:[HKUnit kilocalorieUnit]];
-                        double distance = [[sample totalDistance] doubleValueForUnit:[HKUnit mileUnit]];
-                        NSString *type = [RCTAppleHealthKit stringForHKWorkoutActivityType:[sample workoutActivityType]];
-                        NSString *uuid = [[sample UUID] UUIDString];
-
-                        NSString *startDateString = [RCTAppleHealthKit buildISO8601StringFromDate:sample.startDate];
-                        NSString *endDateString = [RCTAppleHealthKit buildISO8601StringFromDate:sample.endDate];
-
-                        bool isTracked = true;
-                        if ([[sample metadata][HKMetadataKeyWasUserEntered] intValue] == 1) {
-                            isTracked = false;
-                        }
-
-                        NSString* device = @"";
-                        if (@available(iOS 11.0, *)) {
-                            device = [[sample sourceRevision] productType];
-                        } else {
-                            device = [[sample device] name];
-                            if (!device) {
-                                device = @"iPhone";
-                            }
-                        }
-
-                        NSDictionary *elem = @{
-                                               @"uuid": uuid,
-                                               @"activityId" : [NSNumber numberWithInt:[sample workoutActivityType]],
-                                               @"activityName" : type,
-                                               @"calories" : @(energy),
-                                               @"tracked" : @(isTracked),
-                                               @"sourceName" : [[[sample sourceRevision] source] name],
-                                               @"sourceId" : [[[sample sourceRevision] source] bundleIdentifier],
-                                               @"device": device,
-                                               @"distance" : @(distance),
-                                               @"start" : startDateString,
-                                               @"end" : endDateString
-                                               };
-
-                        [data addObject:elem];
+                    for (HKWorkout *workout in results) {
+                        [data addObject:[RCTAppleHealthKit serializeHKWorkout:workout unit:unit]];
                     }
                 } else {
                     for (HKQuantitySample *sample in results) {
-                        HKQuantity *quantity = sample.quantity;
-                        NSString *uuid = [[sample UUID] UUIDString];
-                        double value = [quantity doubleValueForUnit:unit];
-
-                        NSString * valueType = @"quantity";
-                        if (unit == [HKUnit mileUnit]) {
-                            valueType = @"distance";
-                        }
-
-                        NSString *startDateString = [RCTAppleHealthKit buildISO8601StringFromDate:sample.startDate];
-                        NSString *endDateString = [RCTAppleHealthKit buildISO8601StringFromDate:sample.endDate];
-
-                        bool isTracked = true;
-                        if ([[sample metadata][HKMetadataKeyWasUserEntered] intValue] == 1) {
-                            isTracked = false;
-                        }
-
-                        NSString* device = @"";
-                        if (@available(iOS 11.0, *)) {
-                            device = [[sample sourceRevision] productType];
-                        } else {
-                            device = [[sample device] name];
-                            if (!device) {
-                                device = @"iPhone";
-                            }
-                        }
-
-                        NSDictionary *elem = @{
-                                               @"uuid": uuid,
-                                               valueType : @(value),
-                                               @"tracked" : @(isTracked),
-                                               @"sourceName" : [[[sample sourceRevision] source] name],
-                                               @"sourceId" : [[[sample sourceRevision] source] bundleIdentifier],
-                                               @"device": device,
-                                               @"start" : startDateString,
-                                               @"end" : endDateString
-                                               };
-
-                        [data addObject:elem];
+                        [data addObject:[RCTAppleHealthKit serializeHKQuantitySample:sample unit:unit]];
                     }
                 }
 

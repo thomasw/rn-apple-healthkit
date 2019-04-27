@@ -25,6 +25,10 @@
 + (NSDate *)endDateFromOptionsDefaultNow:(NSDictionary *)options;
 + (HKSampleType *)hkQuantityTypeFromString:(NSString *)type;
 
++ (NSDictionary *)serializeHKQuantitySample:(HKQuantitySample *)sample unit:(HKUnit *)unit;
++ (NSDictionary *)serializeHKWorkout:(HKWorkout *)workout unit:(HKUnit *)unit;
++ (NSDictionary *)serializeHKDeletedObject:(HKDeletedObject *)object;
+
 + (HKUnit *)hkUnitFromOptions:(NSDictionary *)options key:(NSString *)key withDefault:(HKUnit *)defaultValue;
 + (NSUInteger)uintFromOptions:(NSDictionary *)options key:(NSString *)key withDefault:(NSUInteger)defaultValue;
 + (double)doubleFromOptions:(NSDictionary *)options key:(NSString *)key withDefault:(double)defaultValue;
