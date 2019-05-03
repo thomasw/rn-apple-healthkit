@@ -138,6 +138,8 @@
     }
 
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:resumeIdKey];
+    
+    resolve(nil);
 }
 
 
