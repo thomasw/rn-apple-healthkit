@@ -267,21 +267,15 @@
     HKQuantity *quantity = sample.quantity;
     NSString *uuid = [[sample UUID] UUIDString];
     double value = [quantity doubleValueForUnit:unit];
-    
-    NSString * valueType = @"quantity";
-    if (unit == [HKUnit mileUnit]) {
-        valueType = @"distance";
-    }
-    
     NSString *startDateString = [RCTAppleHealthKit buildISO8601StringFromDate:sample.startDate];
     NSString *endDateString = [RCTAppleHealthKit buildISO8601StringFromDate:sample.endDate];
-    
+    NSString* device = @"";
     bool isTracked = true;
+    
     if ([[sample metadata][HKMetadataKeyWasUserEntered] intValue] == 1) {
         isTracked = false;
     }
     
-    NSString* device = @"";
     if (@available(iOS 11.0, *)) {
         device = [[sample sourceRevision] productType];
     } else {
@@ -293,14 +287,14 @@
     
     return @{
              @"uuid": uuid,
-             valueType : @(value),
+             @"quantity" : @(value),
              @"tracked" : @(isTracked),
              @"sourceName" : [[[sample sourceRevision] source] name],
              @"sourceId" : [[[sample sourceRevision] source] bundleIdentifier],
              @"device": device,
              @"start" : startDateString,
              @"end" : endDateString
-    };
+             };
 }
 
 + (NSDictionary *)serializeHKWorkout:(HKWorkout *)workout unit:(HKUnit *)unit {
