@@ -305,7 +305,7 @@
 
 + (NSDictionary *)serializeHKWorkout:(HKWorkout *)workout unit:(HKUnit *)unit {
     double energy =  [[workout totalEnergyBurned] doubleValueForUnit:[HKUnit kilocalorieUnit]];
-    double distance = [[workout totalDistance] doubleValueForUnit:[HKUnit mileUnit]];
+    double distance = [workout.totalDistance doubleValueForUnit:unit];
     NSString *type = [RCTAppleHealthKit stringForHKWorkoutActivityType:[workout workoutActivityType]];
     NSString *uuid = [[workout UUID] UUIDString];
     
@@ -339,7 +339,7 @@
              @"distance": @(distance),
              @"start": startDateString,
              @"end": endDateString
-    };
+            };
     
 }
 
