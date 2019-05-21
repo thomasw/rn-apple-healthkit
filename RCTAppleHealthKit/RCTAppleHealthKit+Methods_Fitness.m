@@ -34,8 +34,7 @@
                                     day:date
                              completion:^(double value, NSDate *startDate, NSDate *endDate, NSError *error) {
         if (!value) {
-            NSLog(@"could not fetch step count for day: %@", error);
-            callback(@[RCTMakeError(@"could not fetch step count for day", error, nil)]);
+            callback(@[RCTJSErrorFromNSError(error)]);
             return;
         }
 
@@ -221,8 +220,7 @@
                                            limit:limit
                                       completion:^(NSArray *arr, NSError *err){
         if (err != nil) {
-            NSLog(@"error with fetchCumulativeSumStatisticsCollection: %@", err);
-            callback(@[RCTMakeError(@"error with fetchCumulativeSumStatisticsCollection", err, nil)]);
+            callback(@[RCTJSErrorFromNSError(err)]);
             return;
         }
         callback(@[[NSNull null], arr]);
@@ -281,8 +279,7 @@
 
     [self.healthStore saveObject:sample withCompletion:^(BOOL success, NSError *error) {
         if (!success) {
-            NSLog(@"An error occured saving the step count sample %@. The error was: %@.", sample, error);
-            callback(@[RCTMakeError(@"An error occured saving the step count sample", error, nil)]);
+            callback(@[RCTJSErrorFromNSError(error)]);
             return;
         }
         callback(@[[NSNull null], @(value)]);
@@ -304,9 +301,7 @@
                      NSError *error) {
 
          if (error) {
-             // Perform Proper Error Handling Here...
-             NSLog(@"*** An error occured while setting up the stepCount observer. %@ ***", error.localizedDescription);
-             callback(@[RCTMakeError(@"An error occured while setting up the stepCount observer", error, nil)]);
+             callback(@[RCTJSErrorFromNSError(error)]);
              return;
          }
 
@@ -331,8 +326,7 @@
 
     [self fetchSumOfSamplesOnDayForType:quantityType unit:unit day:date completion:^(double distance, NSDate *startDate, NSDate *endDate, NSError *error) {
         if (!distance) {
-            NSLog(@"ERROR getting DistanceWalkingRunning: %@", error);
-            callback(@[RCTMakeError(@"ERROR getting DistanceWalkingRunning", error, nil)]);
+            callback(@[RCTJSErrorFromNSError(error)]);
             return;
         }
 
@@ -369,8 +363,7 @@
                                            limit:limit
                                       completion:^(NSArray *arr, NSError *err){
                                           if (err != nil) {
-                                              NSLog(@"error with fetchCumulativeSumStatisticsCollection: %@", err);
-                                              callback(@[RCTMakeError(@"error with fetchCumulativeSumStatisticsCollection", err, nil)]);
+                                              callback(@[RCTJSErrorFromNSError(err)]);
                                               return;
                                           }
                                           callback(@[[NSNull null], arr]);
@@ -386,8 +379,7 @@
 
     [self fetchSumOfSamplesOnDayForType:quantityType unit:unit day:date completion:^(double distance, NSDate *startDate, NSDate *endDate, NSError *error) {
         if (!distance) {
-            NSLog(@"ERROR getting DistanceCycling: %@", error);
-            callback(@[RCTMakeError(@"ERROR getting DistanceCycling", error, nil)]);
+            callback(@[RCTJSErrorFromNSError(error)]);
             return;
         }
 
@@ -423,8 +415,7 @@
                                            limit:limit
                                       completion:^(NSArray *arr, NSError *err){
                                           if (err != nil) {
-                                              NSLog(@"error with fetchCumulativeSumStatisticsCollection: %@", err);
-                                              callback(@[RCTMakeError(@"error with fetchCumulativeSumStatisticsCollection", err, nil)]);
+                                              callback(@[RCTJSErrorFromNSError(err)]);
                                               return;
                                           }
                                           callback(@[[NSNull null], arr]);
@@ -440,8 +431,7 @@
 
     [self fetchSumOfSamplesOnDayForType:quantityType unit:unit day:date completion:^(double count, NSDate *startDate, NSDate *endDate, NSError *error) {
         if (!count) {
-            NSLog(@"ERROR getting FlightsClimbed: %@", error);
-            callback(@[RCTMakeError(@"ERROR getting FlightsClimbed", error, nil), @(count)]);
+            callback(@[RCTJSErrorFromNSError(error)]);
             return;
         }
 
@@ -477,8 +467,7 @@
                                            limit:limit
                                       completion:^(NSArray *arr, NSError *err){
                                           if (err != nil) {
-                                              NSLog(@"error with fetchCumulativeSumStatisticsCollection: %@", err);
-                                              callback(@[RCTMakeError(@"error with fetchCumulativeSumStatisticsCollection", err, nil)]);
+                                              callback(@[RCTJSErrorFromNSError(err)]);
                                               return;
                                           }
                                           callback(@[[NSNull null], arr]);
