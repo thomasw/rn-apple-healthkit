@@ -50,14 +50,21 @@
 }
 
 - (void)fitness_watchSamples:(NSDictionary *)input
-                     resolver:(RCTPromiseResolveBlock)resolve
+                    resolver:(RCTPromiseResolveBlock)resolve
                     rejecter:(RCTPromiseRejectBlock)reject
 {
     HKUnit *unit = [RCTAppleHealthKit hkUnitFromOptions:input key:@"unit" withDefault:nil];
     NSString *type = [RCTAppleHealthKit stringFromOptions:input key:@"type" withDefault:nil];
+    NSDate *startDate = [RCTAppleHealthKit dateFromOptions:input key:@"startDate" withDefault:nil];
+    NSDate *endDate = [RCTAppleHealthKit dateFromOptions:input key:@"endDate" withDefault:nil];
     NSString *resumeId = [RCTAppleHealthKit stringFromOptions:input key:@"resumeId" withDefault:nil];
     NSString *resumeIdKey = [NSString stringWithFormat:@"%@%@", @"RCTAppleHealthKit:watchSamples:", resumeId];
     HKQueryAnchor *anchor = HKAnchoredObjectQueryNoAnchor;
+    NSPredicate *predicate = nil;
+    
+    if (startDate != nil || endDate != nil) {
+        predicate = [HKQuery predicateForSamplesWithStartDate:startDate endDate:endDate options:HKQueryOptionStrictStartDate];
+    }
     
     if (resumeId) {
         NSData *rawAnchor = [[NSUserDefaults standardUserDefaults] valueForKey:resumeIdKey];
@@ -67,7 +74,7 @@
             anchor = decodedAnchor;
         }
     }
-
+    
     if (!unit) {
         reject(@"invalid_unit", @"You must specify a valid unit.", nil);
         return;
@@ -80,7 +87,7 @@
     
     HKSampleType *samplesType = [RCTAppleHealthKit hkQuantityTypeFromString:type];
     NSUInteger limit = [RCTAppleHealthKit uintFromOptions:input key:@"limit" withDefault:HKObjectQueryNoLimit];
-
+    
     void (^handler)(HKAnchoredObjectQuery *query, NSArray *sampleObjects, NSArray *deletedSampleObjects, HKQueryAnchor *anchor, NSError *error);
     handler = ^(HKAnchoredObjectQuery *query, NSArray *sampleObjects, NSArray *deletedSampleObjects, HKQueryAnchor *anchor, NSError *error) {
         NSMutableArray *samples = [NSMutableArray arrayWithCapacity:1];
@@ -90,7 +97,7 @@
             resolve(@{ @"samples": samples, @"deleted": deleted});
             return;
         }
-
+        
         dispatch_async(dispatch_get_main_queue(), ^{
             if (samplesType == [HKObjectType workoutType]) {
                 for (HKWorkout *workout in sampleObjects) {
