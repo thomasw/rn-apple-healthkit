@@ -230,6 +230,39 @@
 }
 
 
+- (void)fitness_sumSamples:(NSDictionary *)input callback:(RCTResponseSenderBlock)callback
+{
+    HKUnit *unit = [RCTAppleHealthKit hkUnitFromOptions:input key:@"unit" withDefault:[HKUnit countUnit]];
+    NSString *type = [RCTAppleHealthKit stringFromOptions:input key:@"type" withDefault:nil];
+    NSDate *startDate = [RCTAppleHealthKit dateFromOptions:input key:@"startDate" withDefault:nil];
+    NSDate *endDate = [RCTAppleHealthKit dateFromOptions:input key:@"endDate" withDefault:[NSDate date]];
+
+    if(startDate == nil){
+        callback(@[RCTMakeError(@"startDate is required in options", nil, nil)]);
+        return;
+    }
+    
+    if(type == nil) {
+        callback(@[RCTMakeError(@"type is required in options", nil, nil)]);
+    }
+    
+    HKSampleType *samplesType = [RCTAppleHealthKit hkQuantityTypeFromString:type];
+    
+    [self fetchQuantitiesSum:samplesType
+                        unit:unit
+                   startDate:startDate
+                     endDate:endDate
+                  completion:^(NSNumber *val, NSError *err){
+                      if (err != nil) {
+                          NSLog(@"error with fetchCumulativeSumStatisticsCollection: %@", err);
+                          callback(@[RCTMakeError(@"error with fetchCumulativeSumStatisticsCollection", err, nil)]);
+                          return;
+                      }
+                      callback(@[[NSNull null], val]);
+                  }];
+}
+
+
 - (void)fitness_saveSteps:(NSDictionary *)input callback:(RCTResponseSenderBlock)callback
 {
     double value = [RCTAppleHealthKit doubleFromOptions:input key:@"value" withDefault:(double)0];
