@@ -125,7 +125,7 @@
     HKAnchoredObjectQuery *query =
         [[HKAnchoredObjectQuery alloc]
          initWithType:samplesType
-         predicate:nil
+         predicate:predicate
          anchor:anchor
          limit:limit
          resultsHandler:handler];
