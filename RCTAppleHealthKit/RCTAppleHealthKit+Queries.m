@@ -516,4 +516,24 @@
     [self.healthStore executeQuery:query];
 }
 
+- (void)fetchQuantitiesAverage:(HKQuantityType *)quantityType
+                          unit:(HKUnit *)unit
+                     startDate:(NSDate *)startDate
+                       endDate:(NSDate *)endDate
+                    completion:(void (^)(NSNumber *, NSError *))completionHandler {
+    NSPredicate *predicate = [HKQuery predicateForSamplesWithStartDate:startDate endDate:endDate options:HKQueryOptionStrictStartDate];
+    HKStatisticsQuery *query = [[HKStatisticsQuery alloc] initWithQuantityType:quantityType
+                                                       quantitySamplePredicate:predicate
+                                                                       options:HKStatisticsOptionDiscreteAverage
+                                                             completionHandler:^(HKStatisticsQuery *query, HKStatistics *result, NSError *error) {
+                                                                 HKQuantity *average = [result averageQuantity];
+                                                                 if (completionHandler) {
+                                                                     double value = [average doubleValueForUnit:unit];
+                                                                     completionHandler(@(value), error);
+                                                                 }
+                                                             }];
+    
+    [self.healthStore executeQuery:query];
+}
+
 @end

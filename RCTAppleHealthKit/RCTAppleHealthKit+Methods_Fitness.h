@@ -30,5 +30,6 @@
 - (void)fitness_getFlightsClimbedOnDay:(NSDictionary *)input callback:(RCTResponseSenderBlock)callback;
 - (void)fitness_getDailyFlightsClimbedSamples:(NSDictionary *)input callback:(RCTResponseSenderBlock)callback;
 - (void)fitness_sumSamples:(NSDictionary *)input callback:(RCTResponseSenderBlock)callback;
+- (void)fitness_averageSamples:(NSDictionary *)input callback:(RCTResponseSenderBlock)callback;
 
 @end

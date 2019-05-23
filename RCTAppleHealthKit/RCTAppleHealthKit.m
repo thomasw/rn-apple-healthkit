@@ -164,6 +164,11 @@ RCT_EXPORT_METHOD(sumSamples:(NSDictionary *)input callback:(RCTResponseSenderBl
     [self fitness_sumSamples:input callback:callback];
 }
 
+RCT_EXPORT_METHOD(averageSamples:(NSDictionary *)input callback:(RCTResponseSenderBlock)callback)
+{
+    [self fitness_averageSamples:input callback:callback];
+}
+
 RCT_EXPORT_METHOD(saveSteps:(NSDictionary *)input callback:(RCTResponseSenderBlock)callback)
 {
     [self fitness_saveSteps:input callback:callback];

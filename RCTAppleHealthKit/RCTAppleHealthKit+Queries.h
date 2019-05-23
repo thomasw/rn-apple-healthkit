@@ -63,4 +63,10 @@
                    endDate:(NSDate *)endDate
                 completion:(void (^)(NSNumber *, NSError *))completionHandler;
 
+- (void)fetchQuantitiesAverage:(HKQuantityType *)quantityType
+                          unit:(HKUnit *)unit
+                     startDate:(NSDate *)startDate
+                       endDate:(NSDate *)endDate
+                    completion:(void (^)(NSNumber *, NSError *))completionHandler;
+
 @end
