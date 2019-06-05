@@ -157,16 +157,14 @@
     NSString *type = [RCTAppleHealthKit stringFromOptions:input key:@"type" withDefault:@"Walking"];
     NSDate *startDate = [RCTAppleHealthKit dateFromOptions:input key:@"startDate" withDefault:[NSDate date]];
     NSDate *endDate = [RCTAppleHealthKit dateFromOptions:input key:@"endDate" withDefault:[NSDate date]];
-    
     NSPredicate *predicate = [HKQuery predicateForSamplesWithStartDate:startDate endDate:endDate options:HKQueryOptionStrictStartDate];
-    
     HKSampleType *samplesType = [RCTAppleHealthKit hkQuantityTypeFromString:type];
-    if ([type isEqual:@"Running"] || [type isEqual:@"Cycling"]) {
-        unit = [HKUnit mileUnit];
+    
+    if(unit == nil){
+        callback(@[RCTMakeError(@"unit is required in options", nil, nil)]);
+        return;
     }
-    if ([type isEqual:@"Weight"]) {
-        unit = [HKUnit gramUnit];
-    }
+
     [self fetchSamplesOfType:samplesType
                                 unit:unit
                            predicate:predicate
