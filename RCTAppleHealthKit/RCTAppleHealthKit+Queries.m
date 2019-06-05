@@ -108,13 +108,15 @@
 }
 
 - (void)fetchSamplesOfType:(HKSampleType *)type
-                              unit:(HKUnit *)unit
-                         predicate:(NSPredicate *)predicate
-                         ascending:(BOOL)asc
-                             limit:(NSUInteger)lim
-                        completion:(void (^)(NSArray *, NSError *))completion {
-    NSSortDescriptor *timeSortDescriptor = [[NSSortDescriptor alloc] initWithKey:HKSampleSortIdentifierEndDate
-                                                                       ascending:asc];
+                      unit:(HKUnit *)unit
+                 predicate:(NSPredicate *)predicate
+                 ascending:(BOOL)asc
+                     limit:(NSUInteger)lim
+                completion:(void (^)(NSArray *, NSError *))completion {
+    NSSortDescriptor *startSortDescriptor = [[NSSortDescriptor alloc] initWithKey:HKSampleSortIdentifierStartDate
+                                                                        ascending:asc];
+    NSSortDescriptor *endSortDescriptor = [[NSSortDescriptor alloc] initWithKey:HKSampleSortIdentifierEndDate
+                                                                      ascending:asc];
 
     // declare the block
     void (^handlerBlock)(HKSampleQuery *query, NSArray *results, NSError *error);
@@ -149,7 +151,7 @@
     HKSampleQuery *query = [[HKSampleQuery alloc] initWithSampleType:type
                                                            predicate:predicate
                                                                limit:lim
-                                                     sortDescriptors:@[timeSortDescriptor]
+                                                     sortDescriptors:@[startSortDescriptor, endSortDescriptor]
                                                       resultsHandler:handlerBlock];
 
     [self.healthStore executeQuery:query];
