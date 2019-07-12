@@ -135,6 +135,8 @@
         return [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierBodyMass];
     } else if ([type isEqual:@"BodyFatPercentage"]){
         return [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierBodyFatPercentage];
+    } else if ([type isEqual:@"Swimming"]){
+      return [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierDistanceSwimming];
     }
     // default [type isEqual:@"Workout"])
     return [HKObjectType workoutType];
@@ -269,11 +271,11 @@
     NSString *endDateString = [RCTAppleHealthKit buildISO8601StringFromDate:sample.endDate];
     NSString* device = @"";
     bool isTracked = true;
-    
+
     if ([[sample metadata][HKMetadataKeyWasUserEntered] intValue] == 1) {
         isTracked = false;
     }
-    
+
     if (@available(iOS 11.0, *)) {
         device = [[sample sourceRevision] productType];
     } else {
@@ -282,7 +284,7 @@
             device = @"iPhone";
         }
     }
-    
+
     return @{
              @"uuid": uuid,
              @"quantity" : @(value),
@@ -300,15 +302,15 @@
     double distance = [workout.totalDistance doubleValueForUnit:unit];
     NSString *type = [RCTAppleHealthKit stringForHKWorkoutActivityType:[workout workoutActivityType]];
     NSString *uuid = [[workout UUID] UUIDString];
-    
+
     NSString *startDateString = [RCTAppleHealthKit buildISO8601StringFromDate:workout.startDate];
     NSString *endDateString = [RCTAppleHealthKit buildISO8601StringFromDate:workout.endDate];
-    
+
     bool isTracked = true;
     if ([[workout metadata][HKMetadataKeyWasUserEntered] intValue] == 1) {
         isTracked = false;
     }
-    
+
     NSString* device = @"";
     if (@available(iOS 11.0, *)) {
         device = [[workout sourceRevision] productType];
@@ -318,7 +320,7 @@
             device = @"iPhone";
         }
     }
-    
+
     return @{
              @"uuid": uuid,
              @"activityId": [NSNumber numberWithInt:[workout workoutActivityType]],
@@ -332,7 +334,7 @@
              @"start": startDateString,
              @"end": endDateString
             };
-    
+
 }
 
 +(NSDictionary *)serializeHKDeletedObject:(HKDeletedObject *)object {
